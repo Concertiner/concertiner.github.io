@@ -10,9 +10,8 @@
     }
     section {
         display:flex; flex-wrap:wrap; gap:.5em; font-family:sans-serif;
-
-        &:not(:target) {display:none;}
     }
+    main:not(:target) {display:none;}
     concertina-keyboard {
         border:.1em solid;
     }
@@ -20,23 +19,37 @@
 <a href="#scales">Scales</a>
 <a href="#chords">Chords</a>
 
-<section id="scales">
-    <concertina-keyboard scale="C"></concertina-keyboard>
-</section>
-<section id="chords">
-    <concertina-keyboard chord="Cmajor"></concertina-keyboard>
-    <concertina-keyboard chord="Cmaj7"></concertina-keyboard>
-    <concertina-keyboard chord="Cminor"></concertina-keyboard>
-    <concertina-keyboard chord="Cmin7"></concertina-keyboard>
-</section>
+<main id="scales">
+    <section>
+        <concertina-keyboard scale="C"></concertina-keyboard>
+    </section>
+</main>
+<main id="chords">
+    <form>
+        <label><input type="radio" name="progression" 
+            value="C G Am Em F C D G7 | Am Em F C Dm Am Bm7b5 E7">I V VI III</label>
+        <label><input type="radio" name="progression" 
+            value="C Bm7b5 E7 Am Gm7 C7 F Em7b5 A7 Dm G7 | Am Gm7 C7 F Em7b5 A7 Dm C#m7b5 F#7 Bm7b5 E7">I VII III VI V I</label>
+        <label><input type="range" name="transpose" min="0" max="11" value="0" step="1"><output name="transposed"></output></label>
+        <label><input type="checkbox" name="minor">Relative minor</label>
+    </form>
+    <section></section>
+</main>
 
 <script type="module">
 import {A,E,O,Q} from 'https://aeoq.github.io/AEOQ.mjs'
-window.E = E;
+window.E = E; window.Q = Q;
 import {} from './keyboard.js'
 import {Key} from './common.js'
-Q('#scales').append(
+Q('#scales section').append(
     ...Key.sharp.slice(0,6).map(key => E('concertina-keyboard', {scale: key})),
     ...Key.flat.slice(0,6).reverse().map(key => E('concertina-keyboard', {scale: key}))
 );
+let form = document.forms[0];
+form.oninput = ev => {
+    const intervals = ['1P','2m','2M','3m','3M','4P','5d','5P','6m','6M','7m','7M'];
+    form.transposed.value = Tonal.Chord.transpose(form.minor.checked ? 'A' : 'C', intervals[form.transpose.value]) + (form.minor.checked ? 'm' : '');
+    Q('#chords section').replaceChildren(...form.progression.value.split('|')[form.minor.checked ? 1 : 0].split(' ')
+    .map(chord => chord && E('concertina-keyboard', {chord: Tonal.Chord.transpose(chord, intervals[form.transpose.value])} )));
+}
 </script>
