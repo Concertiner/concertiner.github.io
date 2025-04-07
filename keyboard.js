@@ -36,7 +36,7 @@ class Keyboard extends HTMLElement {
                     /B#|E#|##|b/.test(note) && (note = Tonal.Note.enharmonic(note));
                     let cycle = this.cycle(key)[looped % 2];
                     let b = this.sQ(`#${cycle[i % cycle.length]} b[title='${note}']`);
-                    b && (b.style.background = `hsl(${Keyboard.scale.hues[i]},100%,50%)`);
+                    b && (b.style.background = `hsl(${Keyboard.scale.hues[i]},100%,60%)`);
                 });
                 octave++;
                 looped++;
@@ -56,7 +56,7 @@ class Keyboard extends HTMLElement {
             this.setAttribute('chord', chord.tonic + (chord.aliases.find(a => /^[Δø+\d]/.test(a)) || chord.aliases[0]));
         }
     }
-    exception = key => key == 'Eb' && E(this.sQ(`#L b[title='G#6']`)).set({style: {borderRadius: 0, background: `hsl(140,100%,50%)`}});
+    exception = key => key == 'Eb' && E(this.sQ(`#L b[title='G#6']`)).set({style: {borderRadius: 0, background: `hsl(140,100%,60%)`}});
     cycle = key => {
         if (['C','A','E','Eb'].includes(key)) return Keyboard.scale.pendulum;
         if (['G','D','F','Bb'].includes(key)) return Keyboard.scale.pendulum.toReversed();
@@ -93,11 +93,9 @@ class Keyboard extends HTMLElement {
         &::before {
             content:attr(scale)''attr(chord); order:2;
             font-size:3em;
-            width:1.8em;
+            width:2em;
             text-align:center;
             z-index:2;
-            background:white;
-            margin:0 .2em; padding:1em 0;
         }
         &::after {
             content:attr(sequence);
@@ -109,7 +107,7 @@ class Keyboard extends HTMLElement {
         font-size:2em; width:3em;
     }
     figure {
-        position:absolute; top:.735em; left:50%; transform:translateX(-50%) scaleX(1.7);
+        position:absolute; top:.735em; left:50%; transform:translateX(-50%) scaleX(1.85);
         font-size:4em;
         white-space:nowrap;
         opacity:.2;

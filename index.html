@@ -9,6 +9,17 @@
         src: url('./Bravura.woff2');
     }
     body {font-family:sans-serif;}
+    nav {
+        text-align:center;
+        margin-bottom:1em;
+        a {
+            line-height:2em;
+            font-size:2em;
+            margin:1em; padding:.5em;
+            text-decoration:none;
+            background:gold;
+        }
+    }
     aside {
         font-size:3em;
         margin:1em 0 -1em 0;
@@ -36,8 +47,10 @@
     }
 </style>
 
-<a href="#scales">Scales</a>
-<a href="#chords">Chords</a>
+<nav>
+    <a href="#scales">Scales</a>
+    <a href="#chords">Chords</a>
+</nav>
 
 <aside>
     <staff-signature></staff-signature>
