@@ -1,4 +1,9 @@
 import {A,E,O,Q} from 'https://aeoq.github.io/AEOQ.mjs'
+class Flippable extends Array {
+    constructor(...items) {super(...items);}
+    get current() {return this;}
+    get flipped() {return new Flippable(...this.map(item => item == 'L' ? 'R' : 'L'));}
+}
 class Keyboard extends HTMLElement {
     constructor() {
         super();
@@ -7,12 +12,8 @@ class Keyboard extends HTMLElement {
             E('div', {id: 'L'}), E('div', {id: 'R'}),
             E('figure', [E('staff-note', {classList: 'upper lower'}), E('staff-note'), E('staff-note', {classList: 'upper lower'})])
         );
-        this.sQ('#L').append(
-            ...Keyboard.left.map(n => E('b', {title: n, classList: n.replace(/\d$/,'')}))
-        );
-        this.sQ('#R').append(
-            ...Keyboard.right.map(n => E('b', {title: n, classList: n.replace(/\d$/,'')}))
-        );
+        this.sQ('#L').append(...Keyboard.left.map(n => E('b', {title: n, classList: n.replace(/\d$/,'')})));
+        this.sQ('#R').append(...Keyboard.right.map(n => E('b', {title: n, classList: n.replace(/\d$/,'')})));
         this.sQ('#L b:nth-of-type(-n+6)', (b, i) => b.textContent = Keyboard.altered[0][i]);
         this.sQ('#L b:nth-last-of-type(-n+6)', (b, i) => b.textContent = Keyboard.altered[1][i]);
         this.sQ('#R b:nth-of-type(-n+6)', (b, i) => b.textContent = Keyboard.altered[2][i]);
@@ -27,18 +28,21 @@ class Keyboard extends HTMLElement {
     show = {
         scale: key => {
             let octave = ['G','A','B'].includes(key.includes('b') ? Tonal.Note.enharmonic(key)[0] : key[0]) ? 2 : 3;
-            let looped = 1;
+            let sq = this.sequence(key);
+            sq.length > 2 && this.shadowRoot.append(
+                E('p', [...sq, ...sq.slice(0,3)].join('')),
+                E('p', [...sq.slice(1,3), ...sq.flipped, `[${sq[0]}]`].join(''))
+            );
             while (octave <= 7) {
+                sq = sq.flipped;
                 Tonal.Scale.get(`${key}${octave} major`).notes.forEach((note, i) => {
                     if (octave <= 3 && parseInt(Tonal.Note.distance('G3', note)) < 0 ||
                         octave >= 6 && parseInt(Tonal.Note.distance(note, 'C7')) < 0) 
                         return;
-                    let cycle = this.cycle(key)[looped % 2];
-                    this.mark(cycle[i % cycle.length], note, `degree-${i+1}`);
-                    i == 4 && this.mark(cycle[i % cycle.length], Tonal.Note.transpose(note, '1A'), `degree-#5`)
+                    this.mark(sq[i % sq.length], note, `degree-${i+1}`);
+                    i == 4 && this.mark(sq[i % sq.length], Tonal.Note.transpose(note, '1A'), `degree-#5`)
                 });
                 octave++;
-                looped++;
             }
             this.setAttribute('scale', key.replace('#','♯').replace('b','♭'));
         },
@@ -60,20 +64,17 @@ class Keyboard extends HTMLElement {
         b ??= (flipped = true) && this.sQ(`#${hand == 'L' ? 'R' : 'L'} b[title='${note}']`);
         b ? b.classList.add(clas, flipped ? 'flipped' : null) : console.log(hand, note);
     }
-    cycle = key => {
-        if (['C','A','E','Eb'].includes(key)) return Keyboard.scale.pendulum;
-        if (['G','D','F','Bb'].includes(key)) return Keyboard.scale.pendulum.toReversed();
-        let sequence = 
-            key == 'Ab' ? Keyboard.scale.cycle2 : 
-            key == 'Db' ? Keyboard.scale.cycle2.toReversed() : Keyboard.scale.cycle1;
-        return this.setAttribute('sequence', sequence[0].join(' ')) || sequence;
-    }
+    sequence = key => 
+        ['C','A','E','Eb'].includes(key) ? Keyboard.sequence.LR :
+        ['G','D','F','Bb'].includes(key) ? Keyboard.sequence.LR.flipped :
+        key == 'Ab' ? Keyboard.sequence.RRLL : 
+        key == 'Db' ? Keyboard.sequence.RRLL.flipped : Keyboard.sequence.RLLL;
+    
     static altered = [['♯','♯','♯','♭','♭','♭'],['♭','♭','♭','♯','♯','♯'],['♯','♭','♭','♭','♯','♯'],['♯','♯','♯','♯','♭']]
-    static scale = {
-        pendulum: [['L','R'],['R','L']],
-        cycle1: [['R','L','L','L'],['L','R','R','R']],
-        cycle2: [['R','R','L','L'],['L','L','R','R']],
-        hues: [0,35,60,140,190,250,290]
+    static sequence = {
+        LR: new Flippable('L','R'),
+        RLLL: new Flippable('R','L','L','L'),
+        RRLL: new Flippable('R','R','L','L'),
     }
     static chord = {
         extend: {
@@ -91,7 +92,7 @@ class Keyboard extends HTMLElement {
     :host {
         display:inline-flex; align-items:center;
         position:relative;
-        padding:1em 1em 0 1em;
+        padding:0 1em;
 
         &::before {
             content:attr(scale)''attr(chord); order:2;
@@ -100,11 +101,6 @@ class Keyboard extends HTMLElement {
             text-align:center;
             z-index:2;
         }
-        &::after {
-            content:attr(sequence);
-            position:absolute; left:48%; top:4%;
-            font-size:1.5em;
-        } 
     }
     :host([chord])::before {
         font-size:2em; width:3em;
@@ -121,6 +117,7 @@ class Keyboard extends HTMLElement {
         display:grid; grid-template:repeat(6,2em)/repeat(4,1em); gap:0 1em;
         grid-auto-flow:column;
         position:relative;
+        margin:1em 0;
 
         staff-note {
             position:absolute; top:.36em; left:.38em;
@@ -130,8 +127,8 @@ class Keyboard extends HTMLElement {
             z-index:1;
         }
     }
-    #L {margin-bottom:1em;}
     #R {
+        margin-bottom:0;
         order:3;
         grid-template:repeat(7,2em)/repeat(4,1em);
 
@@ -161,12 +158,27 @@ class Keyboard extends HTMLElement {
         &.degree-5 {--h:190;}
         &.degree-6 {--h:250;}
         &.degree-7 {--h:290;}
-        &[class~='degree-#5'] {--h:205; --b:80%; border-style:dashed;}
+        &[class~='degree-#5'] {--h:205; --b:80%; border-style:dotted;}
         &.flipped {border-radius:0;}
         &.note {background:black;}
         &.root {background:red;}
         &.tension {background:yellow;}
         &.omit {background:silver;}
+    }
+    p {
+        position:absolute;
+        font-size:1.25em;
+        padding:.1em .25em; margin:0;
+        outline:.1em solid;
+
+        &:nth-of-type(1) {
+            left:41%; top:0;
+            &::first-letter {color:hsl(0,100%,60%);}
+        }
+        &:nth-of-type(2) {
+            right:41%; bottom:0;
+            &::first-letter {color:hsl(250,100%,60%);}
+        }
     }`
 }
 customElements.define('concertina-keyboard', Keyboard);
