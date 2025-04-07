@@ -33,15 +33,13 @@ class Keyboard extends HTMLElement {
                     if (octave <= 3 && parseInt(Tonal.Note.distance('G3', note)) < 0 ||
                         octave >= 6 && parseInt(Tonal.Note.distance(note, 'C7')) < 0) 
                         return;
-                    /B#|E#|##|b/.test(note) && (note = Tonal.Note.enharmonic(note));
                     let cycle = this.cycle(key)[looped % 2];
-                    let b = this.sQ(`#${cycle[i % cycle.length]} b[title='${note}']`);
-                    b && (b.style.background = `hsl(${Keyboard.scale.hues[i]},100%,60%)`);
+                    this.mark(cycle[i % cycle.length], note, `degree-${i+1}`);
+                    i == 4 && this.mark(cycle[i % cycle.length], Tonal.Note.transpose(note, '1A'), `degree-#5`)
                 });
                 octave++;
                 looped++;
             }
-            this.exception(key);
             this.setAttribute('scale', key.replace('#','♯').replace('b','♭'));
         },
         chord: key => {
@@ -56,7 +54,12 @@ class Keyboard extends HTMLElement {
             this.setAttribute('chord', chord.tonic + (chord.aliases.find(a => /^[Δø+\d]/.test(a)) || chord.aliases[0]));
         }
     }
-    exception = key => key == 'Eb' && E(this.sQ(`#L b[title='G#6']`)).set({style: {borderRadius: 0, background: `hsl(140,100%,60%)`}});
+    mark = (hand, note, clas) => {
+        /B#|E#|##|b/.test(note) && (note = Tonal.Note.enharmonic(note));
+        let b = this.sQ(`#${hand} b[title='${note}']`), flipped;
+        b ??= (flipped = true) && this.sQ(`#${hand == 'L' ? 'R' : 'L'} b[title='${note}']`);
+        b ? b.classList.add(clas, flipped ? 'flipped' : null) : console.log(hand, note);
+    }
     cycle = key => {
         if (['C','A','E','Eb'].includes(key)) return Keyboard.scale.pendulum;
         if (['G','D','F','Bb'].includes(key)) return Keyboard.scale.pendulum.toReversed();
@@ -141,6 +144,7 @@ class Keyboard extends HTMLElement {
         scale:1.5;
         text-align:center; line-height:.9em;
         --f:.9; font-size:calc(var(--f)*1em);
+        background:hsl(var(--h),100%,var(--b,60%));
 
         #L &:nth-of-type(-n+12),
         #R &:nth-of-type(n+14) {
@@ -150,6 +154,15 @@ class Keyboard extends HTMLElement {
         #R &:nth-last-of-type(5) {
             grid-row-start:2;
         }
+        &.degree-1 {--h:0;}
+        &.degree-2 {--h:35;}
+        &.degree-3 {--h:60;}
+        &.degree-4 {--h:140;}
+        &.degree-5 {--h:190;}
+        &.degree-6 {--h:250;}
+        &.degree-7 {--h:290;}
+        &[class~='degree-#5'] {--h:205; --b:80%; border-style:dashed;}
+        &.flipped {border-radius:0;}
         &.note {background:black;}
         &.root {background:red;}
         &.tension {background:yellow;}
