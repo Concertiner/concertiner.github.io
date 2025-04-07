@@ -8,17 +8,50 @@
         font-family: Bravura;
         src: url('./Bravura.woff2');
     }
-    section {
-        display:flex; flex-wrap:wrap; gap:.5em; font-family:sans-serif;
+    body {font-family:sans-serif;}
+    aside {
+        font-size:3em;
+        margin:1em 0 -1em 0;
+        pointer-events:none;
+
+        staff-note::part(i) {scale:.7;}
+        staff-note::part(u)::before,staff-note::part(u)::after {color:darkgray;}
     }
-    main:not(:target) {display:none;}
+    section {
+        flex-wrap:wrap; gap:.5em;
+    }
+    aside,section {
+        display:flex; justify-content:center;
+    }
+    #scales section {
+        display:grid; grid-template-rows:repeat(7,auto); grid-auto-flow:column;
+
+        concertina-keyboard[scale=C] {grid-area:1/1/2/3; justify-self:center;}
+        concertina-keyboard[scale=F] {grid-row-start:2;}
+    }
+    aside:has(~:target),main:not(:target) {display:none;}
     concertina-keyboard {
-        border:.1em solid;
+        border:.1rem solid;
+        font-size:.8em;
     }
 </style>
+
 <a href="#scales">Scales</a>
 <a href="#chords">Chords</a>
 
+<aside>
+    <staff-signature></staff-signature>
+    <staff-note class="upper lower" notes="𝅗/Ab3 𝅗/Eb4 𝅗/Bb4 𝅗/F#5 𝅗/C#6 𝅗/G#6"></staff-note>
+    <staff-note class="upper lower" notes="𝅗/A3 𝅗/E4 𝅗/B4 𝅗/F5 𝅗/C6 𝅗/G6" style="margin-left:-.5em"></staff-note>
+    <staff-note class="upper lower" notes="𝅗/C4 𝅗/G4 𝅗/D5 𝅗/A5 𝅗/E6 𝅗/B6" style="margin-left:-.5em"></staff-note>
+    <staff-note class="upper lower" notes="𝅗/C#4 𝅗/G#4 𝅗/D#5 𝅗/Ab5 𝅗/Eb6 𝅗/Bb6" style="margin-left:-.3em"></staff-note>
+    <staff-note></staff-note>
+    <staff-note></staff-note>
+    <staff-note class="upper lower" notes="𝅗/G#3 𝅗/D#4 𝅗/Ab4 𝅗/Eb5 𝅗/Bb5 𝅗/F#6" style="margin-left:-.5em"></staff-note>
+    <staff-note class="upper lower" notes="𝅗/G3 𝅗/D4 𝅗/A4 𝅗/E5 𝅗/B5 𝅗/F6 𝅗/C7" style="margin-left:-.5em"></staff-note>
+    <staff-note class="upper lower" notes="𝅗/B3 𝅗/F4 𝅗/C5 𝅗/G5 𝅗/D6 𝅗/A6" style="margin-left:-.5em"></staff-note>
+    <staff-note class="upper lower" notes="𝅗/Bb3 𝅗/F#4 𝅗/C#5 𝅗/G#5 𝅗/D#6" style="margin-left:-.3em"></staff-note>
+</aside>
 <main id="scales">
     <section>
         <concertina-keyboard scale="C"></concertina-keyboard>
@@ -39,11 +72,12 @@
 <script type="module">
 import {A,E,O,Q} from 'https://aeoq.github.io/AEOQ.mjs'
 window.E = E; window.Q = Q;
-import {} from './keyboard.js'
 import {Key} from './common.js'
+import {} from './keyboard.js'
+import {} from './staff.js'
 Q('#scales section').append(
     ...Key.sharp.slice(0,6).map(key => E('concertina-keyboard', {scale: key})),
-    ...Key.flat.slice(0,6).reverse().map(key => E('concertina-keyboard', {scale: key}))
+    ...Key.flat.slice(0,6).map(key => E('concertina-keyboard', {scale: key}))
 );
 let form = document.forms[0];
 form.oninput = ev => {

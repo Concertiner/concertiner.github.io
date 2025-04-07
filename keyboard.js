@@ -2,9 +2,21 @@ import {A,E,O,Q} from 'https://aeoq.github.io/AEOQ.mjs'
 class Keyboard extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({mode: 'open'}).append(E('style', Keyboard.css), E('div', {id: 'L'}), E('div', {id: 'R'}));
-        this.sQ('#L').append(...Keyboard.left.map(n => E('b', {title: n, classList: n.replace(/\d$/,'')})));
-        this.sQ('#R').append(...Keyboard.right.map(n => E('b', {title: n, classList: n.replace(/\d$/,'')})));
+        this.attachShadow({mode: 'open'}).append(
+            E('style', Keyboard.css), 
+            E('div', {id: 'L'}), E('div', {id: 'R'}),
+            E('figure', [E('staff-note', {classList: 'upper lower'}), E('staff-note'), E('staff-note', {classList: 'upper lower'})])
+        );
+        this.sQ('#L').append(
+            ...Keyboard.left.map(n => E('b', {title: n, classList: n.replace(/\d$/,'')}))
+        );
+        this.sQ('#R').append(
+            ...Keyboard.right.map(n => E('b', {title: n, classList: n.replace(/\d$/,'')}))
+        );
+        this.sQ('#L b:nth-of-type(-n+6)', (b, i) => b.textContent = Keyboard.altered[0][i]);
+        this.sQ('#L b:nth-last-of-type(-n+6)', (b, i) => b.textContent = Keyboard.altered[1][i]);
+        this.sQ('#R b:nth-of-type(-n+6)', (b, i) => b.textContent = Keyboard.altered[2][i]);
+        this.sQ('#R b:nth-last-of-type(-n+5)', (b, i) => b.textContent = Keyboard.altered[3][i]);
     }
     connectedCallback() {
         ['scale','chord'].forEach(which => {
@@ -53,6 +65,7 @@ class Keyboard extends HTMLElement {
             key == 'Db' ? Keyboard.scale.cycle2.toReversed() : Keyboard.scale.cycle1;
         return this.setAttribute('sequence', sequence[0].join(' ')) || sequence;
     }
+    static altered = [['♯','♯','♯','♭','♭','♭'],['♭','♭','♭','♯','♯','♯'],['♯','♭','♭','♭','♯','♯'],['♯','♯','♯','♯','♭']]
     static scale = {
         pendulum: [['L','R'],['R','L']],
         cycle1: [['R','L','L','L'],['L','R','R','R']],
@@ -80,31 +93,56 @@ class Keyboard extends HTMLElement {
         &::before {
             content:attr(scale)''attr(chord); order:2;
             font-size:3em;
-            width:2em;
+            width:1.8em;
             text-align:center;
+            z-index:2;
+            background:white;
+            margin:0 .2em; padding:1em 0;
         }
         &::after {
             content:attr(sequence);
-            position:absolute; left:46%; top:5%;
+            position:absolute; left:48%; top:4%;
             font-size:1.5em;
         } 
     }
     :host([chord])::before {
         font-size:2em; width:3em;
     }
+    figure {
+        position:absolute; top:.735em; left:50%; transform:translateX(-50%) scaleX(1.7);
+        font-size:4em;
+        white-space:nowrap;
+        opacity:.2;
+        z-index:1;
+        margin:0;
+    }
     div {
         display:grid; grid-template:repeat(6,2em)/repeat(4,1em); gap:0 1em;
         grid-auto-flow:column;
+        position:relative;
+
+        staff-note {
+            position:absolute; top:.36em; left:.38em;
+            transform:scaleX(2);
+            font-size:4em;
+            opacity:.3;
+            z-index:1;
+        }
     }
+    #L {margin-bottom:1em;}
     #R {
         order:3;
         grid-template:repeat(7,2em)/repeat(4,1em);
+
+        staff-note {top:.485em;}
     }
     b {
-        width:1em; height:1em;
-        border:.1em solid; border-radius:9em;
+        width:calc(1em/var(--f)); height:calc(1em/var(--f));
+        border:calc(.1em/var(--f)) solid; border-radius:9em;
         box-sizing:border-box;
         scale:1.5;
+        text-align:center; line-height:.9em;
+        --f:.9; font-size:calc(var(--f)*1em);
 
         #L &:nth-of-type(-n+12),
         #R &:nth-of-type(n+14) {

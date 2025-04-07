@@ -11,11 +11,12 @@ class Staff extends HTMLElement {
         padding-top:.5em; margin-top:1.2em;
         position:relative;
     }
-    b,i,u {
+    b,i,u,::slotted(:where(b,i)) {
         all:unset;
         &[hidden] {display:none;}
     }
-    b,i,u::before,u::after,span,concertina-keyboard {
+    :host(staff-note:not([pitch])) :is(b,i) {display:none;}
+    b,i,u::before,u::after,span,::slotted(*) {
         position:absolute;
     }
     i,u::before,u::after,span {
@@ -58,13 +59,17 @@ class Staff extends HTMLElement {
 class Note extends Staff {
     constructor() {
         super();
-        this.shadowRoot.append(E('style', this.css),
+        this.shadowRoot.append(E('style', this.css), E('slot'),
             E('b', '𝄫', {id: 'bb'}), E('b', '♭', {id: 'b'}), E('b', '♮', {id: 'n'}), E('b', '♯', {id: '#'}), E('b', '𝄪', {id: 'x'}),
             E('i', '𝅘𝅥'), E('span'), E('i', '𝅘𝅥'), E('span')
         );
     }
     set pitch(pitch) {this.setAttribute('pitch', pitch)}
     set acci(acci) {this.showAcci = acci;}
+    connectedCallback() {
+        (!this.getAttribute('pitch')) 
+        
+    }
     attributeChangedCallback(_, __, pitch) {
         Note.left.includes(Note.equivalent(pitch)) && this.classList.add('left');
         Note.both.includes(Note.equivalent(pitch)) && this.classList.add('both');

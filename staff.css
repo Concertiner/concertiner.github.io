@@ -1,0 +1,32 @@
+:host {
+    display:inline-block;
+    font-family:bravura,sans-serif;
+    position:relative;
+}
+b,i,u,::slotted(:where(b,i)) {
+    all:unset;
+    &[hidden] {display:none;}
+}
+:host(staff-note:not([notes])) :is(b,i) {display:none;}
+b,i,u::before,u::after,span,::slotted(*) {
+    position:absolute;
+}
+b,u::before,u::after,span {
+    left:50%; transform:translateX(-50%);
+}
+u {
+    position:relative;
+
+    :host(.upper) &::before {content:'𝄚'; bottom:1.25em;}
+    :host(.lower) &::after {content:'𝄗'; top:.875em;}
+}
+b,i {
+    top:calc(var(--top)*1em);
+}
+i {right:72%;}
+
+concertina-keyboard {
+    font-size:.15em;
+    top:-7em; left:1em;
+    width:20em;
+}
