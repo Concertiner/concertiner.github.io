@@ -136,12 +136,12 @@ class Keyboard extends HTMLElement {
     }
     b {
         width:calc(1em/var(--f)); height:calc(1em/var(--f));
-        border:calc(.1em/var(--f)) solid; border-radius:9em;
+        border:calc(.1em/var(--f)) solid black; border-radius:9em;
         box-sizing:border-box;
         scale:1.5;
-        text-align:center; line-height:.9em;
+        text-align:center; line-height:.8em;
         --f:.9; font-size:calc(var(--f)*1em);
-        background:hsl(var(--h),100%,var(--b,60%));
+        background:hsl(var(--h),100%,var(--b,50%));
 
         #L &:nth-of-type(-n+12),
         #R &:nth-of-type(n+14) {
@@ -156,8 +156,8 @@ class Keyboard extends HTMLElement {
         &.degree-3 {--h:60;}
         &.degree-4 {--h:140;}
         &.degree-5 {--h:190;}
-        &.degree-6 {--h:250;}
-        &.degree-7 {--h:290;}
+        &.degree-6 {--h:250; color:white;}
+        &.degree-7 {--h:290; color:white;}
         &[class~='degree-#5'] {--h:205; --b:80%; border-style:dotted;}
         &.flipped {border-radius:0;}
         &.note {background:black;}
@@ -168,16 +168,16 @@ class Keyboard extends HTMLElement {
     p {
         position:absolute;
         font-size:1.25em;
-        padding:.1em .25em; margin:0;
-        outline:.1em solid;
+        padding:0 .25em; margin:0;
+        outline:.1rem solid;
 
         &:nth-of-type(1) {
-            left:41%; top:0;
-            &::first-letter {color:hsl(0,100%,60%);}
+            left:43%; top:0;
+            &::first-letter {color:hsl(0,100%,50%);}
         }
         &:nth-of-type(2) {
-            right:41%; bottom:0;
-            &::first-letter {color:hsl(250,100%,60%);}
+            right:43%; bottom:0;
+            &::first-letter {color:hsl(250,100%,50%);}
         }
     }`
 }
