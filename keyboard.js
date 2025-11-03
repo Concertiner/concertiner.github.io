@@ -9,11 +9,11 @@ class Keyboard extends HTMLElement {
         super();
         this.attachShadow({mode: 'open'}).append(
             E('style', Keyboard.css), 
-            E('div', {id: 'L'}), E('div', {id: 'R'}),
-            E('figure', [E('staff-note', {classList: 'upper lower'}), E('staff-note'), E('staff-note', {classList: 'upper lower'})])
+            E('div#L'), E('div#R'),
+            E('figure', [E('staff-note.upper.lower'), E('staff-note'), E('staff-note.upper.lower')])
         );
-        this.sQ('#L').append(...Keyboard.left.map(n => E('b', {title: n, classList: n.replace(/\d$/,'')})));
-        this.sQ('#R').append(...Keyboard.right.map(n => E('b', {title: n, classList: n.replace(/\d$/,'')})));
+        this.sQ('#L').append(...Keyboard.left.map(n => E(`b.${n.replace(/\d$/,'')}`, {title: n})));
+        this.sQ('#R').append(...Keyboard.right.map(n => E(`b.${n.replace(/\d$/,'')}`, {title: n})));
         this.sQ('#L b:nth-of-type(-n+6)', (b, i) => b.textContent = Keyboard.altered[0][i]);
         this.sQ('#L b:nth-last-of-type(-n+6)', (b, i) => b.textContent = Keyboard.altered[1][i]);
         this.sQ('#R b:nth-of-type(-n+6)', (b, i) => b.textContent = Keyboard.altered[2][i]);

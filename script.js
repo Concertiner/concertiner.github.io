@@ -60,7 +60,7 @@ class Note extends Staff {
     constructor() {
         super();
         this.shadowRoot.append(E('style', this.css), E('slot'),
-            E('b', '𝄫', {id: 'bb'}), E('b', '♭', {id: 'b'}), E('b', '♮', {id: 'n'}), E('b', '♯', {id: '#'}), E('b', '𝄪', {id: 'x'}),
+            E('b#bb', '𝄫'), E('b#b', '♭'), E('b#n', '♮'), E('b', '♯', {id: '#'}), E('b#x', '𝄪'),
             E('i', '𝅘𝅥'), E('span'), E('i', '𝅘𝅥'), E('span')
         );
     }
